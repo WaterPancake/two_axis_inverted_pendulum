@@ -1,7 +1,7 @@
 # Two Axis Cart Pole
 is an extension of the canonical Cart Pole by adding another dimension of traversal and control to the cart, and another degree of freedom to the inverted pendulum.
 
-The model used is Built off the the [inverted pendulum from Brax](https://github.com/google/brax/blob/main/brax/envs/assets/inverted_pendulum.xml) created by Google.
+The model used is built off the the [inverted pendulum from Brax](https://github.com/google/brax/blob/main/brax/envs/assets/inverted_pendulum.xml) created by Google.
 
 ## Environment
 The inverted two-axis pendulum can be represented as the following:
