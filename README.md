@@ -1,9 +1,3 @@
----
-layout: default
-title: Two Axis Cart Pole
-permalink: /two_axis_inverted_pendulum/
----
-
 # Two Axis Cart Pole
 is an extension of the canonical Cart Pole by adding another dimension of traversal and control to the cart, and another degree of freedom to the inverted pendulum.
 
