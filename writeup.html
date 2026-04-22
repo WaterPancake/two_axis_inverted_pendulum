@@ -1,0 +1,676 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.9.37">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>Two Axis Cart Pole</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+</style>
+
+
+<script src="writeup_files/libs/clipboard/clipboard.min.js"></script>
+<script src="writeup_files/libs/quarto-html/quarto.js" type="module"></script>
+<script src="writeup_files/libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="writeup_files/libs/quarto-html/popper.min.js"></script>
+<script src="writeup_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="writeup_files/libs/quarto-html/anchor.min.js"></script>
+<link href="writeup_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="writeup_files/libs/quarto-html/quarto-syntax-highlighting-7f8f88aac4f3542376d5c11b86a4c14d.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="writeup_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="writeup_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="writeup_files/libs/bootstrap/bootstrap-138a6193a3bd40baf1e627da441a4734.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+</head>
+
+<body class="fullcontent quarto-light">
+
+<div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
+
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Two Axis Cart Pole</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="environement" class="level2">
+<h2 class="anchored" data-anchor-id="environement">Environement</h2>
+<section id="modeling" class="level3">
+<h3 class="anchored" data-anchor-id="modeling">Modeling</h3>
+<p>A frame of the system can be expressed as: <span class="math inline">\(\textbf{x} = \left[ x, y, \theta_x, \theta_y, \dot{x}, \dot y, \dot{\theta_x}, \dot{\theta_y} \right]\)</span></p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 31%">
+<col style="width: 31%">
+<col style="width: 18%">
+<col style="width: 18%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Variable</th>
+<th>Description</th>
+<th>minVal</th>
+<th>maxVal</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><span class="math inline">\(x\)</span></td>
+<td>carts position along x-axis</td>
+<td>-2</td>
+<td>2</td>
+</tr>
+<tr class="even">
+<td><span class="math inline">\(y\)</span></td>
+<td>carts position along y-axis</td>
+<td>-2</td>
+<td>2</td>
+</tr>
+<tr class="odd">
+<td><span class="math inline">\(\theta_x\)</span></td>
+<td>poles angle along the x axis about the cart in radians</td>
+<td><span class="math inline">\(0\)</span></td>
+<td><span class="math inline">\(2\pi\)</span></td>
+</tr>
+<tr class="even">
+<td><span class="math inline">\(\theta_y\)</span></td>
+<td>poles angle along the y axis about the cart in radian</td>
+<td><span class="math inline">\(0\)</span></td>
+<td><span class="math inline">\(2\pi\)</span></td>
+</tr>
+<tr class="odd">
+<td><span class="math inline">\(\dot x\)</span></td>
+<td>be the linear velocity of cart along x-axis</td>
+<td><span class="math inline">\(-\infty\)</span></td>
+<td><span class="math inline">\(\infty\)</span></td>
+</tr>
+<tr class="even">
+<td><span class="math inline">\(\dot y\)</span></td>
+<td>be then linear velocity of cart along y-axis</td>
+<td><span class="math inline">\(-\infty\)</span></td>
+<td><span class="math inline">\(\infty\)</span></td>
+</tr>
+<tr class="odd">
+<td><span class="math inline">\(\dot \theta_x\)</span></td>
+<td>the angular velocity of the pole along the x axis about the cart</td>
+<td><span class="math inline">\(-\infty\)</span></td>
+<td><span class="math inline">\(\infty\)</span></td>
+</tr>
+<tr class="even">
+<td><span class="math inline">\(\dot \theta_y\)</span></td>
+<td>the angular velocity of the pole along the y axis about the car</td>
+<td><span class="math inline">\(-\infty\)</span></td>
+<td><span class="math inline">\(\infty\)</span></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="kinematrics" class="level3">
+<h3 class="anchored" data-anchor-id="kinematrics">Kinematrics</h3>
+<p>The position and velocity of of the mass at the end of the pendulum can be obtained as follow:</p>
+<p><span class="math display">\[\textbf{x}_{p} = \begin{bmatrix} x_p \\ y_p \\ z_p \end{bmatrix} =
+\begin{bmatrix}
+x_c + \ell\sin(\theta_x) \\
+y_c + \ell\sin(\theta_y) \\
+\ell\cos(\theta_x)\cos(\theta_y)
+\end{bmatrix}\]</span></p>
+<p><span class="math display">\[\dot{\textbf{x}}_{p} = \begin{bmatrix} \dot x_p \\ \dot y_p \\ \dot z_p
+\end{bmatrix}
+= \begin{bmatrix}
+\dot x_c + \ell \cos(\theta_x) \dot \theta_x \\
+\dot y_c + \ell \cos(\theta_y) \dot \theta_y \\
+-\ell \sin{(\theta_x)}\cos{(\theta_y)} \dot\theta_x - \ell \sin{(\theta_y)}\cos{(\theta_x)} \dot \theta_y
+\end{bmatrix}\]</span></p>
+</section>
+<section id="lagrangian" class="level3">
+<h3 class="anchored" data-anchor-id="lagrangian">Lagrangian</h3>
+<p>The first step in creating an LQR controller is the linearize the systems equation of motions about a fixed point. We can calculate these equations using the Lagrangian which state that, <span class="math display">\[L = T - V\]</span> where <span class="math inline">\(T\)</span> and <span class="math inline">\(V\)</span> represent the kinetic and potential energy of the system respectively, obtaining:</p>
+<ul>
+<li><h4 id="kinetic-energy" class="anchored">Kinetic Energy</h4>
+<p>Applying the equation for Kinetic Energy (<span class="math inline">\(KE = \frac{1}{2}mv^2\)</span>) yields: <span class="math display">\[T_p = \frac{1}{2} m_p(\dot x_p^2 + \dot y_p^2 + \dot z_p^2)\]</span> <span class="math display">\[T_c = \frac{1}{2} m_c(\dot x_c^2 + \dot y_c^2)\]</span> We must also consider the angular movement or rotational kinetic energy of the pole in our equation (<span class="math inline">\(KE = \frac{1}{2} I \omega^2\)</span>): <span class="math display">\[T_{r} = \frac{1}{2} I (\dot \theta_x^2 + \dot\theta_y^2)\]</span> where <span class="math inline">\(I = m_p \ell^2\)</span> represents the moment of inertia of the pendulum mass. Thus the total kinetic energy defined as: <span class="math display">\[T = T_p + T_c + T_{r}\]</span></p></li>
+<li><h4 id="potential-energy" class="anchored">Potential Energy</h4>
+<p>The potential energy of the effect of graviety on the pendulum mass (<span class="math inline">\(V = mgh)\)</span> is the only source considered (energy of the cart is not considered).</p></li>
+</ul>
+<p><span class="math display">\[V = m_p g \ell \cos(\theta_x) \cos(\theta_y) \]</span></p>
+<ul>
+<li><h4 id="full-equations" class="anchored">Full Equations</h4>
+<span class="math display">\[L =\frac{1}{2} \left(m_p (\dot x_p^2 + \dot y_p^2 + \dot z_p^2) + I (\dot \theta_x^2 + \dot \theta_y^2) + m_c (\dot x_c^2 + \dot y_c^2)  \right) - m_p g \ell \cos(\theta_x) \cos(\theta_y) \]</span></li>
+</ul>
+</section>
+<section id="equations-of-motion" class="level3">
+<h3 class="anchored" data-anchor-id="equations-of-motion">Equations of Motion</h3>
+<p>Using the methods of Legrange, we can write the equation of motion using generalized cordinates. The dynamics equations (<span class="math inline">\(Q_i\)</span>) for the generalized coordinates (<span class="math inline">\(q_i\)</span>) is obtained from the equation: <span class="math display">\[\frac{d}{dt}\left(\frac{\partial L}{\partial \dot q_i}\right) - \frac{\partial L}{\partial q_i} = Q_i\]</span> In this system, the generalized coordinates choosen will be <span class="math inline">\(q =\left[x_c , y_c,  \theta_x,  \theta_y \right]\)</span>. Since there are variables in <span class="math inline">\(L\)</span> that are not in <span class="math inline">\(q\)</span>, subsituting them for their equivalent to contain only values from <span class="math inline">\(q\)</span> reveals:</p>
+<p><span class="math display">\[L = \frac{1}{2}\left( m_p\left[ \left(\dot x_c + \ell\cos(\theta_x)\dot \theta_x\right)^2 + \left(\dot y_c +\ell\cos(\theta_y)\dot\theta_y \right)^2 + \left(-\ell \sin{(\theta_x)}\cos{(\theta_y)} \dot\theta_x - \ell \sin{(\theta_y)}\cos{(\theta_x)} \dot \theta_y\right)^2\right] + I(\dot\theta_x^2 + \dot\theta_y^2)  + m_c(\dot x_c^2 +\dot y_c^2)\right) -m_p g\ell\cos(\theta_x)\cos(\theta_y)\]</span></p>
+<p>The followin is the grueling process of deriving all of the equations of motions and subsitution to contain only generalized cordinates and constants.</p>
+<ul>
+<li><h4 id="x_c" class="anchored"><span class="math inline">\(x_c\)</span></h4>
+<ul>
+<li><p><span class="math inline">\(\frac{\partial L}{\partial \dot x_c}\)</span> <span class="math display">\[\boxed{\dot x_c(m_c + m_p) + m_p \ell \cos(\theta_x)\dot \theta_x}\]</span></p></li>
+<li><p><span class="math inline">\(\frac{d}{dt} \left( \frac{\partial L}{\partial \dot x_c}\right)\)</span> <span class="math display">\[\boxed{\ddot x_c( m_c + m_p)+ m_p \ell \left(\cos(\theta_x)\ddot \theta_x - \sin(\theta_x)\dot \theta_x^2 \right)}\]</span></p></li>
+<li><p><span class="math inline">\(\frac{\partial L}{\partial x_c}\)</span> <span class="math display">\[\boxed{0}\]</span></p></li>
+<li><p><span class="math inline">\(F_x\)</span> <span class="math display">\[\boxed{F_x = \ddot x_c(m_c+m_p) + m_p\ell\left(\cos(\theta_x)\ddot \theta_x-\sin(\theta_x)\dot \theta_x^2 \right)}\]</span></p></li>
+</ul></li>
+<li><h4 id="theta_x" class="anchored"><span class="math inline">\(\theta_x\)</span></h4>
+<ul>
+<li><span class="math inline">\(\frac{\partial L}{\partial \dot \theta_x}\)</span> <span class="math display">\[m_p\ell\cos(\theta_x)\dot x_c+\dot{\theta_x}\left[m_p\ell^2\cos^2(\theta_x)+m_p\ell^2\sin^2(\theta_x)\cos^2(\theta_y)+ I\right] + m_p\ell^2\sin(\theta_x)\sin(\theta_y)\cos(\theta_x)\cos(\theta_y)\dot \theta_y\]</span></li>
+</ul>
+<p>Since the LQR controller will be for stabalizing the system when near its unstable equalibrum, we can make the equatiosns simplier by applying small angle approximations such as:</p>
+<ul>
+<li><span class="math inline">\(\cos^2(\theta) \approx 1\)</span></li>
+<li><span class="math inline">\(\sin^2(\theta) \approx 0\)</span></li>
+<li><span class="math inline">\(\sin(\theta_x)\sin(\theta_y)\cos(\theta_x)\cos(\theta_y) \approx 0\)</span></li>
+<li><span class="math inline">\(\cos(\theta)\sin(\theta) \approx 0\)</span></li>
+</ul>
+<p>producing: <span class="math display">\[\boxed{m_p\ell\cos(\theta_x)\dot x_c + \dot \theta_x\left[m_p\ell^2 +I\right]}\]</span></p>
+<ul>
+<li><p><span class="math inline">\(\frac{d}{dt}\left(\frac{\partial L}{\partial \dot \theta_x}\right)\)</span> <span class="math display">\[\boxed{m_p\ell\cos(\theta_x)\ddot x-m_p\ell\sin(\theta_x)\dot\theta_x\dot x+\ddot\theta_x[m_p\ell^2+I]}\]</span></p></li>
+<li><p><span class="math inline">\(\frac{\partial L}{\partial \theta_x}\)</span> <span class="math display">\[{m_p\left[(\dot x + \ell\cos(\theta_x)\dot\theta_x)\cdot(-\sin(\theta_x)\dot\theta_x) + (-\ell\sin(\theta_x)\cos(\theta_y)\dot\theta_x-\ell\sin(\theta_y)\cos(\theta_x)\dot\theta_y)\cdot(\ell\sin(\theta_y)\sin(\theta_x)\dot\theta_y-\ell\cos(\theta_x)\cos(\theta_y)\dot\theta_x)\right]+m_pg\ell\sin(\theta_x)\cos(\theta_y)}\]</span></p></li>
+</ul></li>
+</ul>
+<p><span class="math display">\[\boxed{-m_p \dot x \sin(\theta_x)\dot\theta_x}\]</span></p>
+<ul>
+<li><span class="math inline">\(F_{\theta_x}\)</span></li>
+</ul>
+<p>After applying small angle approximations, <span class="math display">\[\boxed{m_p\ell\cos(\theta_x)\ddot x_c+\ddot\theta_x[m_p\ell^2+I]+m_p\ell^2\sin(\theta_x)\cos(\theta_y)\dot\theta_x^2+m_pg\ell\sin(\theta_x)\cos(\theta_y)}\]</span></p>
+<p>The others can be derived by symetry.</p>
+</section>
+<section id="linearization" class="level3">
+<h3 class="anchored" data-anchor-id="linearization">Linearization</h3>
+<p>LQR requires that the dyanmics of system be modeled as the linear equation <span class="math inline">\(\dot{\textbf{x}} = A\textbf{x} + Bu\)</span> around a stable fixed point (the pendulum-up position) as <span class="math inline">\(\textbf{x}_{f} =[x_c, y_c, 0, 0]\)</span> and <span class="math inline">\(\dot{\textbf{x}}_f = [0, 0, 0, 0]\)</span> using only control inputs <span class="math inline">\(u = [F_x, F_y]\)</span>.</p>
+<ul>
+<li><span class="math inline">\(\cos(\theta) \approx 1\)</span></li>
+<li><span class="math inline">\(\sin(\theta) \approx \theta\)</span></li>
+<li><span class="math inline">\(\theta^2 \approx 0\)</span></li>
+</ul>
+<p>We can pose the problem as a coupled equation and solve for <span class="math inline">\(F_x\)</span>.</p>
+<p><span class="math display">\[\begin{aligned} \ddot x_c (m_c + m_p) + m_p \ell \ddot \theta_x = F_{x}\\
+m_p \ell \ddot x_c + \ddot \theta_x (I + m_p\ell^2) + m_p g \ell \theta_x =  0 \end{aligned}\]</span></p>
+<p>Which we can solve as:</p>
+<p><span class="math display">\[\begin{bmatrix}
+m_c + m_p &amp; m_p\ell \\
+m_p\ell &amp; I + m_p\ell^2  \end{bmatrix}
+\begin{bmatrix}\ddot x_c \\ \ddot \theta_x \end{bmatrix} =
+\begin{bmatrix} F_x \\ -m_p g\ell\theta_x \end{bmatrix}\]</span></p>
+<p>The inverse of the <span class="math inline">\(M\)</span> matrix is defined as <span class="math inline">\(\frac{1}{D} M = M^{-1}\)</span> where <span class="math inline">\(D = det(M)\)</span></p>
+<p><span class="math display">\[\begin{bmatrix}\ddot x_c \\ \ddot \theta_x \end{bmatrix} = M^{-1}\begin{bmatrix} F_x \\ -m_p g\ell\theta_x \end{bmatrix} = \frac{1}{D}
+\begin{bmatrix} F_x(m_c + m_p) - \theta_x m_p^2 g \ell^2\\
+F_x m_p \ell - \theta_x (m_p g \ell )(I+ m_p \ell^2) \end{bmatrix}\]</span></p>
+<p>Revealing the coeffiicnets to be:</p>
+<p><span class="math display">\[ \ddot x_c = F_x \frac{m_c+m_p}{D} - \theta_x \frac{m_p^2 g \ell^2]}{D}\]</span></p>
+<p><span class="math display">\[\ddot \theta_x = F_x \frac{m_p \ell}{D} - \theta_x \frac{(m_p g \ell)(I + m_p\ell^2)}{D}\]</span></p>
+</section>
+<section id="lqr-cost-2-go" class="level3">
+<h3 class="anchored" data-anchor-id="lqr-cost-2-go">LQR / Cost-2-Go</h3>
+</section>
+</section>
+
+</main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>
