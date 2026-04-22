@@ -25,4 +25,6 @@ $$u = \left[ F_x, F_y \right]^T$$
 
 corresponding to linear force applied to the cart in the $x$ and $y$ axis respectfully.
 
+A writeup can be found [here](https://waterpancake.github.io/two_axis_cart_pole/)
+
 
