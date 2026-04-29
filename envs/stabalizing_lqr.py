@@ -22,7 +22,10 @@ class LinearQuadraticRegulator:
         self.ell = ell
         self.g = g
 
-        self.Inertia = self.m_pole * self.ell**2
+        # The writeup models a massless rod with a point mass at the end.
+        # The point-mass inertia is included in J below, so there is no extra
+        # pole inertia term to add here.
+        self.Inertia = 0.0
 
         self.A, self.B = self.linearize()
 
@@ -43,39 +46,31 @@ class LinearQuadraticRegulator:
         State: [x, y, θ_x, θ_y, ẋ, ẏ, θ̇_x, θ̇_y]
         """
 
-        D = (self.m_cart + self.m_pole) * (self.Inertia + self.m_pole * self.ell**2) - (
-            self.m_pole * self.ell
-        ) ** 2
+        J = self.Inertia + self.m_pole * self.ell**2
+        D = (self.m_cart + self.m_pole) * J - (self.m_pole * self.ell) ** 2
 
-        p = (self.m_cart + self.m_pole) / D
-        q = (self.m_pole**2 * self.ell**2 * self.g) / D
-        r = (
-            self.Inertia * self.m_pole * self.g * self.ell
-            + self.m_pole**2 * self.ell**3 * self.g
-        ) / D
-        s = self.m_pole * self.ell / D
+        p = J / D
+        q = (self.g * (self.ell**2) * (self.m_pole**2)) / D
+        r = (self.m_pole * self.ell) / D
+        s = ((self.m_cart + self.m_pole) * (self.m_pole * self.ell * self.g)) / D
 
         A = np.zeros((8, 8))
 
-        A[0, 4] = 1.0
-        A[1, 5] = 1.0
-        A[2, 6] = 1.0
-        A[3, 7] = 1.0
-        # ẍ = q*θ_x,  ÿ = q*θ_y
-        A[4, 2] = q
-        A[5, 3] = q
-
-        # θ̈_x = r*θ_x,  θ̈_y = r*θ_y
-        A[6, 2] = r
-        A[7, 3] = r
+        A[0, 4] = 1
+        A[1, 5] = 1
+        A[2, 6] = 1
+        A[3, 7] = 1
+        A[4, 2] = -q
+        A[5, 3] = -q
+        A[6, 2] = s
+        A[7, 3] = s
 
         B = np.zeros((8, 2))
 
         B[4, 0] = p
         B[5, 1] = p
-
-        B[6, 0] = s
-        B[7, 1] = s
+        B[6, 0] = -r
+        B[7, 1] = -r
 
         return A, B
 
@@ -141,7 +136,7 @@ class EnergySwingUp:
         self,
         m_pole: float = 0.25,
         ell: float = 0.6,
-        g: float = 9.81,
+        g: float = -9.81,
         k: float = 2.0,
     ):
         self.m_pole = m_pole
@@ -176,7 +171,7 @@ if __name__ == "__main__":
     import mujoco.viewer
     import time
     from numpy import random
-    from interface import TwoAxisInvertedPendulum
+    from mujoco_interface import TwoAxisInvertedPendulum
 
     sys = TwoAxisInvertedPendulum()
 

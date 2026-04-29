@@ -95,10 +95,8 @@ window.Quarto = {
 </header>
 
 
-<section id="environement" class="level2">
-<h2 class="anchored" data-anchor-id="environement">Environement</h2>
-<section id="modeling" class="level3">
-<h3 class="anchored" data-anchor-id="modeling">Modeling</h3>
+<section id="environment" class="level2">
+<h2 class="anchored" data-anchor-id="environment">Environment</h2>
 <p>A frame of the system can be expressed as: <span class="math inline">\(\textbf{x} = \left[ x, y, \theta_x, \theta_y, \dot{x}, \dot y, \dot{\theta_x}, \dot{\theta_y} \right]\)</span></p>
 <table class="caption-top table">
 <colgroup>
@@ -160,16 +158,15 @@ window.Quarto = {
 </tr>
 <tr class="even">
 <td><span class="math inline">\(\dot \theta_y\)</span></td>
-<td>the angular velocity of the pole along the y axis about the car</td>
+<td>the angular velocity of the pole along the y axis about the cart</td>
 <td><span class="math inline">\(-\infty\)</span></td>
 <td><span class="math inline">\(\infty\)</span></td>
 </tr>
 </tbody>
 </table>
-</section>
-<section id="kinematrics" class="level3">
-<h3 class="anchored" data-anchor-id="kinematrics">Kinematrics</h3>
-<p>The position and velocity of of the mass at the end of the pendulum can be obtained as follow:</p>
+<section id="kinematics" class="level3">
+<h3 class="anchored" data-anchor-id="kinematics">Kinematics</h3>
+<p>For the small-angle model used in the LQR linearization, the position and velocity of the mass at the end of the pendulum with a massless rod may be approximated as follows:</p>
 <p><span class="math display">\[\textbf{x}_{p} = \begin{bmatrix} x_p \\ y_p \\ z_p \end{bmatrix} =
 \begin{bmatrix}
 x_c + \ell\sin(\theta_x) \\
@@ -189,22 +186,21 @@ y_c + \ell\sin(\theta_y) \\
 <p>The first step in creating an LQR controller is the linearize the systems equation of motions about a fixed point. We can calculate these equations using the Lagrangian which state that, <span class="math display">\[L = T - V\]</span> where <span class="math inline">\(T\)</span> and <span class="math inline">\(V\)</span> represent the kinetic and potential energy of the system respectively, obtaining:</p>
 <ul>
 <li><h4 id="kinetic-energy" class="anchored">Kinetic Energy</h4>
-<p>Applying the equation for Kinetic Energy (<span class="math inline">\(KE = \frac{1}{2}mv^2\)</span>) yields: <span class="math display">\[T_p = \frac{1}{2} m_p(\dot x_p^2 + \dot y_p^2 + \dot z_p^2)\]</span> <span class="math display">\[T_c = \frac{1}{2} m_c(\dot x_c^2 + \dot y_c^2)\]</span> We must also consider the angular movement or rotational kinetic energy of the pole in our equation (<span class="math inline">\(KE = \frac{1}{2} I \omega^2\)</span>): <span class="math display">\[T_{r} = \frac{1}{2} I (\dot \theta_x^2 + \dot\theta_y^2)\]</span> where <span class="math inline">\(I = m_p \ell^2\)</span> represents the moment of inertia of the pendulum mass. Thus the total kinetic energy defined as: <span class="math display">\[T = T_p + T_c + T_{r}\]</span></p></li>
+<p>Applying the equation for Kinetic Energy (<span class="math inline">\(KE = \frac{1}{2}mv^2\)</span>) yields: <span class="math display">\[T_p = \frac{1}{2} m_p(\dot x_p^2 + \dot y_p^2 + \dot z_p^2)\]</span> <span class="math display">\[T_c = \frac{1}{2} m_c(\dot x_c^2 + \dot y_c^2)\]</span> <span class="math display">\[T = T_p + T_c\]</span></p></li>
 <li><h4 id="potential-energy" class="anchored">Potential Energy</h4>
-<p>The potential energy of the effect of graviety on the pendulum mass (<span class="math inline">\(V = mgh)\)</span> is the only source considered (energy of the cart is not considered).</p></li>
+<p>The potential energy of the effect of gravity on the pendulum mass (<span class="math inline">\(V = mgh)\)</span> is the only source considered (energy of the cart is not considered).</p></li>
 </ul>
 <p><span class="math display">\[V = m_p g \ell \cos(\theta_x) \cos(\theta_y) \]</span></p>
 <ul>
 <li><h4 id="full-equations" class="anchored">Full Equations</h4>
-<span class="math display">\[L =\frac{1}{2} \left(m_p (\dot x_p^2 + \dot y_p^2 + \dot z_p^2) + I (\dot \theta_x^2 + \dot \theta_y^2) + m_c (\dot x_c^2 + \dot y_c^2)  \right) - m_p g \ell \cos(\theta_x) \cos(\theta_y) \]</span></li>
+<span class="math display">\[L =\frac{1}{2} \left(m_p (\dot x_p^2 + \dot y_p^2 + \dot z_p^2) + m_c (\dot x_c^2 + \dot y_c^2)  \right) - m_p g \ell \cos(\theta_x) \cos(\theta_y) \]</span></li>
 </ul>
 </section>
 <section id="equations-of-motion" class="level3">
 <h3 class="anchored" data-anchor-id="equations-of-motion">Equations of Motion</h3>
-<p>Using the methods of Legrange, we can write the equation of motion using generalized cordinates. The dynamics equations (<span class="math inline">\(Q_i\)</span>) for the generalized coordinates (<span class="math inline">\(q_i\)</span>) is obtained from the equation: <span class="math display">\[\frac{d}{dt}\left(\frac{\partial L}{\partial \dot q_i}\right) - \frac{\partial L}{\partial q_i} = Q_i\]</span> In this system, the generalized coordinates choosen will be <span class="math inline">\(q =\left[x_c , y_c,  \theta_x,  \theta_y \right]\)</span>. Since there are variables in <span class="math inline">\(L\)</span> that are not in <span class="math inline">\(q\)</span>, subsituting them for their equivalent to contain only values from <span class="math inline">\(q\)</span> reveals:</p>
-<p><span class="math display">\[L = \frac{1}{2}\left( m_p\left[ \left(\dot x_c + \ell\cos(\theta_x)\dot \theta_x\right)^2 + \left(\dot y_c +\ell\cos(\theta_y)\dot\theta_y \right)^2 + \left(-\ell \sin{(\theta_x)}\cos{(\theta_y)} \dot\theta_x - \ell \sin{(\theta_y)}\cos{(\theta_x)} \dot \theta_y\right)^2\right] + I(\dot\theta_x^2 + \dot\theta_y^2)  + m_c(\dot x_c^2 +\dot y_c^2)\right) -m_p g\ell\cos(\theta_x)\cos(\theta_y)\]</span></p>
-<p>The first step is to write the equation</p>
-<p>The followin is the grueling process of deriving all of the equations of motions and subsitution to contain only generalized cordinates and constants.</p>
+<p>Using the methods of Lagrange, we can write the equation of motion using generalized coordinates. The dynamics equations (<span class="math inline">\(Q_i\)</span>) for the generalized coordinates (<span class="math inline">\(q_i\)</span>) is obtained from the equation: <span class="math display">\[\frac{d}{dt}\left(\frac{\partial L}{\partial \dot q_i}\right) - \frac{\partial L}{\partial q_i} = Q_i\]</span> In this system, the generalized coordinates chosen will be <span class="math inline">\(q =\left[x_c , y_c,  \theta_x,  \theta_y \right]\)</span>. Since there are variables in <span class="math inline">\(L\)</span> that are not in <span class="math inline">\(q\)</span>, substituting them for their equivalent to contain only values from <span class="math inline">\(q\)</span> reveals:</p>
+<p><span class="math display">\[L = \frac{1}{2}\left( m_p\left[ \left(\dot x_c + \ell\cos(\theta_x)\dot \theta_x\right)^2 + \left(\dot y_c +\ell\cos(\theta_y)\dot\theta_y \right)^2 + \left(-\ell \sin{(\theta_x)}\cos{(\theta_y)} \dot\theta_x - \ell \sin{(\theta_y)}\cos{(\theta_x)} \dot \theta_y\right)^2\right] + m_c(\dot x_c^2 +\dot y_c^2)\right) -m_p g\ell\cos(\theta_x)\cos(\theta_y)\]</span></p>
+<p>The following is the grueling process of deriving all of the equations of motions and substitution to contain only generalized coordinates and constants.</p>
 <ul>
 <li><h4 id="x_c" class="anchored"><span class="math inline">\(x_c\)</span></h4>
 <ul>
@@ -215,24 +211,78 @@ y_c + \ell\sin(\theta_y) \\
 </ul></li>
 <li><h4 id="theta_x" class="anchored"><span class="math inline">\(\theta_x\)</span></h4>
 <ul>
-<li><p><span class="math inline">\(\frac{\partial L}{\partial \dot \theta_x}\)</span> <span class="math display">\[m_p\ell\cos(\theta_x)\dot x_c+\dot{\theta_x}\left[m_p\ell^2\cos^2(\theta_x)+m_p\ell^2\sin^2(\theta_x)\cos^2(\theta_y)+ I\right] + m_p\ell^2\sin(\theta_x)\sin(\theta_y)\cos(\theta_x)\cos(\theta_y)\dot \theta_y\]</span> Applying some approximations to make the equations easier to work with.</p>
-<ul>
-<li><span class="math inline">\(\cos^2(\theta) \approx 1\)</span></li>
-<li><span class="math inline">\(\sin^2(\theta) \approx 0\)</span></li>
-<li><span class="math inline">\(\sin(\theta_x)\sin(\theta_y)\cos(\theta_x)\cos(\theta_y) \approx 0\)</span></li>
-<li><span class="math inline">\(\cos(\theta)\sin(\theta) \approx 0\)</span> <span class="math display">\[\boxed{m_p\ell\cos(\theta_x)\dot x_c + \dot \theta_x\left[m_p\ell^2 +I\right]}\]</span></li>
-</ul></li>
-<li><p><span class="math inline">\(\frac{d}{dt}\left(\frac{\partial L}{\partial \dot \theta_x}\right)\)</span> <span class="math display">\[\boxed{m_p\ell\cos(\theta_x)\ddot x-m_p\ell\sin(\theta_x)\dot\theta_x\dot x+\ddot\theta_x[m_p\ell^2+I]}\]</span></p></li>
-<li><p><span class="math inline">\(\frac{\partial L}{\partial \theta_x}\)</span> <span class="math display">\[\boxed{m_p\left[(\dot x + \ell\cos(\theta_x)\dot\theta_x)\cdot(-\sin(\theta_x)\dot\theta_x) + (-\ell\sin(\theta_x)\cos(\theta_y)\dot\theta_x-\ell\sin(\theta_y)\cos(\theta_x)\dot\theta_y)\cdot(\ell\sin(\theta_y)\sin(\theta_x)\dot\theta_y-\ell\cos(\theta_x)\cos(\theta_y)\dot\theta_x)\right]+m_pg\ell\sin(\theta_x)\cos(\theta_y)}\]</span></p></li>
-<li><p><span class="math inline">\(F_{\theta_x}\)</span> After applying small angle approximations, <span class="math display">\[\boxed{m_p\ell\cos(\theta_x)\ddot x_c+\ddot\theta_x[m_p\ell^2+I]+m_p\ell^2\sin(\theta_x)\cos(\theta_y)\dot\theta_x^2+m_pg\ell\sin(\theta_x)\cos(\theta_y)}\]</span></p></li>
-</ul></li>
+<li><span class="math inline">\(\frac{\partial L}{\partial \dot \theta_x}\)</span> <!-- $$m_p\ell\cos(\theta_x)\dot x_c+\dot{\theta_x}\left[m_p\ell^2\cos^2(\theta_x)+m_p\ell^2\sin^2(\theta_x)\cos^2(\theta_y)+ I\right] + m_p\ell^2\sin(\theta_x)\sin(\theta_y)\cos(\theta_x)\cos(\theta_y)\dot \theta_y$$ --></li>
 </ul>
+<!-- Since the LQR controller will be for stabilizing the system when near its unstable equilibrium, we can make the equations simpler by applying small angle approximations such as:
+  - $\cos^2(\theta) \approx 1$
+  - $\sin^2(\theta) \approx 0$
+  - $\sin(\theta_x)\sin(\theta_y)\cos(\theta_x)\cos(\theta_y) \approx 0$
+  - $\cos(\theta)\sin(\theta) \approx 0$ -->
+<!-- producing:
+$$\boxed{m_p\ell\cos(\theta_x)\dot x_c + \dot \theta_x\left[m_p\ell^2 +I\right]}$$ --></li>
+</ul>
+<p><span class="math display">\[\boxed{m_p \ell \cos(\theta_x)\dot x_c + m_p\ell^2\dot\theta_x}\]</span></p>
+<ul>
+<li><p><span class="math inline">\(\frac{d}{dt}\left(\frac{\partial L}{\partial \dot \theta_x}\right)\)</span> <span class="math display">\[\boxed{m_p\ell\cos(\theta_x)\ddot x_c-m_p\ell\sin(\theta_x)\dot\theta_x\dot x_c+m_p\ell^2\ddot\theta_x}\]</span></p></li>
+<li><p><span class="math inline">\(\frac{\partial L}{\partial \theta_x}\)</span> <span class="math display">\[{m_p\left[(\dot x + \ell\cos(\theta_x)\dot\theta_x)\cdot(-\sin(\theta_x)\dot\theta_x) + (-\ell\sin(\theta_x)\cos(\theta_y)\dot\theta_x-\ell\sin(\theta_y)\cos(\theta_x)\dot\theta_y)\cdot(\ell\sin(\theta_y)\sin(\theta_x)\dot\theta_y-\ell\cos(\theta_x)\cos(\theta_y)\dot\theta_x)\right]+m_pg\ell\sin(\theta_x)\cos(\theta_y)}\]</span></p></li>
+</ul>
+<p><span class="math display">\[\boxed{m_pg\ell\sin(\theta_x)}\]</span></p>
+<ul>
+<li><span class="math inline">\(F_{\theta_x}\)</span></li>
+</ul>
+<p>After applying small angle approximations, <span class="math display">\[\boxed{m_p\ell\ddot x_c+m_p\ell^2\ddot\theta_x-m_pg\ell\theta_x = 0}\]</span></p>
+<p>The others can be derived by symmetry.</p>
 </section>
 <section id="linearization" class="level3">
 <h3 class="anchored" data-anchor-id="linearization">Linearization</h3>
+<p>LQR requires that the dynamics of system be modeled as the linear equation <span class="math inline">\(\dot{\textbf{x}} = A\textbf{x} + Bu\)</span> around a stable fixed point (the pendulum-up position) as <span class="math inline">\(\textbf{x}_{f} =[x_c, y_c, 0, 0]\)</span> and <span class="math inline">\(\dot{\textbf{x}}_f = [0, 0, 0, 0]\)</span> using only control inputs <span class="math inline">\(u = [F_x, F_y]\)</span>.</p>
+<ul>
+<li><span class="math inline">\(\cos(\theta) \approx 1\)</span></li>
+<li><span class="math inline">\(\sin(\theta) \approx \theta\)</span></li>
+<li><span class="math inline">\(\theta^2 \approx 0\)</span></li>
+</ul>
+<p>For the massless rod and point-mass model, the point-mass rotational inertia is already included in the translational kinetic energy. Let <span class="math inline">\(J = m_p\ell^2\)</span>. If the pole has non-negligible inertia, use <span class="math inline">\(J = I_p + m_p\ell^2\)</span> instead.</p>
+<p>We can pose the problem as a coupled equation and solve for <span class="math inline">\(\ddot x_c\)</span> and <span class="math inline">\(\ddot\theta_x\)</span>.</p>
+<p><span class="math display">\[\begin{aligned} \ddot x_c (m_c + m_p) + m_p \ell \ddot \theta_x = F_{x}\\
+m_p \ell \ddot x_c + J \ddot \theta_x - m_p g \ell \theta_x =  0 \end{aligned}\]</span></p>
+<p>Which can be solved by:</p>
+<p><span class="math display">\[\begin{bmatrix}(m_c + m_p) &amp; m_p \ell \\ m_p\ell &amp; J\end{bmatrix}
+\begin{bmatrix} \ddot x_c \\ \ddot\theta_x\end{bmatrix} =
+\begin{bmatrix} F_x \\ m_p g \ell \theta_x\end{bmatrix}\]</span></p>
+<p>where</p>
+<p><span class="math display">\[D = (m_c + m_p)J - (m_p\ell)^2\]</span></p>
+<p><span class="math display">\[\begin{bmatrix}\ddot x_c \\ \ddot \theta_x\end{bmatrix} = \frac{1}{D}\begin{bmatrix}JF_x - m_p^2\ell^2g\theta_x \\ -m_p\ell F_x + (m_c+m_p)m_pg\ell\theta_x\end{bmatrix}\]</span></p>
+<p>Revealing the coefficients to be:</p>
+<p><span class="math display">\[\ddot x_c = F_x \underbrace{\frac{J}{D}}_p - \theta_x \underbrace{\frac{m_p^2\ell^2g}{D}}_q\]</span></p>
+<p><span class="math display">\[\ddot \theta_x = -F_x \underbrace{\frac{m_p\ell}{D}}_r + \theta_x \underbrace{\frac{(m_c + m_p)(m_p\ell g)}{D}}_s\]</span></p>
+<p>Since the system is symmetric, the coefficients for <span class="math inline">\(\ddot y_c\)</span> and <span class="math inline">\(\ddot \theta_y\)</span> are the same.</p>
 </section>
 <section id="lqr-cost-2-go" class="level3">
 <h3 class="anchored" data-anchor-id="lqr-cost-2-go">LQR / Cost-2-Go</h3>
+<!-- For notation, let $p = \frac{J}{D}$, $q = \frac{m_p^2\ell^2g}{D}$, $r = \frac{m_p\ell}{D}$ and $s = \frac{(m_c+m_p)(m_p\ell g)}{D}$ -->
+<p>LQR requires the system to be written as a linear equation</p>
+<p><span class="math display">\[\begin{bmatrix} \dot x_c \\ \dot y_c \\ \dot \theta_x \\ \dot \theta_y \\ \ddot x_c \\ \ddot y_c \\ \ddot \theta_x \\ \ddot \theta_y \end{bmatrix}  = A \begin{bmatrix} x_c \\  y_c \\ \theta_x \\ \theta_y \\ \dot x_c \\ \dot y_c \\ \dot \theta_x \\ \dot \theta_y \end{bmatrix} + B \begin{bmatrix} F_x \\ F_y\end{bmatrix}\]</span></p>
+<p>The non-trivial values of <span class="math inline">\(A\)</span> are:</p>
+<p><span class="math display">\[A = \begin{bmatrix}
+0 &amp; 0 &amp; 0 &amp; 0 &amp; 1 &amp; 0 &amp; 0 &amp; 0  \\
+0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 1 &amp; 0 &amp; 0  \\
+0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 1 &amp; 0  \\
+0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 1  \\
+0 &amp; 0 &amp; -q &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0  \\
+0 &amp; 0 &amp; 0 &amp; -q &amp; 0 &amp; 0 &amp; 0 &amp; 0  \\
+0 &amp; 0 &amp; s &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0  \\
+0 &amp; 0 &amp; 0 &amp; s &amp; 0 &amp; 0 &amp; 0 &amp; 0  \\
+\end{bmatrix}\]</span></p>
+<p><span class="math display">\[B = \begin{bmatrix}
+0 &amp; 0 \\
+0 &amp; 0 \\
+0 &amp; 0 \\
+0 &amp; 0 \\
+p &amp; 0 \\
+0 &amp; p \\
+-r &amp; 0 \\
+0 &amp; -r \\
+\end{bmatrix}\]</span></p>
 </section>
 </section>
 
