@@ -135,7 +135,7 @@ LQR requires that the dynamics of system be modeled as the linear equation $\dot
   - $\sin(\theta) \approx \theta$
   - $\theta^2 \approx 0$
 
-For the massless rod and point-mass model, the point-mass rotational inertia is already included in the translational kinetic energy. Let $J = m_p\ell^2$. If the pole has non-negligible inertia, use $J = I_p + m_p\ell^2$ instead.
+For the massless rod and point-mass model, the point-mass rotational inertia is already included in the translational kinetic energy. Let $J = m_p\ell^2$.
 
 We can pose the problem as a coupled equation and solve for $\ddot x_c$ and $\ddot\theta_x$.
 
