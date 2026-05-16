@@ -1,4 +1,4 @@
-<!-- This version has a nearly weightless pole with a mass at the end. This is better resembles the problem definition of the Cart Pole Prolbem found in https://underactuated.csail.mit.edu/acrobot.html#cart_pole -->
+<!-- Uses a ball joint instead of two hinge joints, increas cart weight. -->
 <mujoco model="inverted two-axis pendulum">
   <compiler inertiafromgeom="true"/>
   <default>
@@ -49,21 +49,18 @@
   </worldbody>
   
   <actuator>
-  <motor ctrllimited="true" ctrlrange="-1 1" gear="100" joint="x_slider" name="x_slide"/>
-  <motor ctrllimited="true" ctrlrange="-1 1" gear="100" joint="y_slider" name="y_slide"/>
+  <motor ctrllimited="true" ctrlrange="-1 1" gear="50" joint="x_slider" name="x_slide"/>
+  <motor ctrllimited="true" ctrlrange="-1 1" gear="50" joint="y_slider" name="y_slide"/>
   </actuator>
 
 
 <sensor>
   <jointpos name="x_pos" joint="x_slider"/>
   <jointpos name="y_pos" joint="y_slider"/>
-  <!-- <jointpos name="hinge_x_pos" joint="hinge_x"/>
-  <jointpos name="hinge_y_pos" joint="hinge_y"/> -->
+
 
   <jointvel name="x_vel" joint="x_slider"/>
   <jointvel name="y_vel" joint="y_slider"/>
-  <!-- <jointvel name="hinge_x_vel" joint="hinge_x"/>
-  <jointvel name="hinge_y_vel" joint="hinge_y"/> -->
 
   <actuatorfrc name="x_force" actuator="x_slide"/>
   <actuatorfrc name="y_force" actuator="y_slide"/>

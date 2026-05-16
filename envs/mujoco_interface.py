@@ -2,7 +2,6 @@
 Mujoco backend for the the two axis inverted pendulum
 """
 
-import argparse
 import mujoco
 import mujoco.viewer
 import numpy as np
@@ -134,33 +133,3 @@ class TwoAxisInvertedPendulum:
                 self.control(controller.action())
                 viewer.sync()
                 time.sleep(timestep)
-
-
-def _parse_args() -> argparse.Namespace:
-    parser = argparse.ArgumentParser(description="Mode for the Mujoco viewer.")
-    parser.add_argument(
-        "--viewer",
-        choices=("passive", "interactive"),
-        default="passive",
-    )
-    parser.add_argument(
-        "--random-reset",
-        action="store_true",
-        help="Randomize the initial state before launching the viewer.",
-    )
-
-    return parser.parse_args()
-
-
-if __name__ == "__main__":
-    args = _parse_args()
-    sys = TwoAxisInvertedPendulum()
-
-    rng = random.default_rng(42)
-    sys.reset(rng if args.random_reset else None)
-    print(sys.get_obs_2p())
-
-    if args.viewer == "interactive":
-        sys.run_interactive_viewer()
-    else:
-        sys.run_passive_viewer()
